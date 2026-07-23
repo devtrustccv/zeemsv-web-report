@@ -1,0 +1,13 @@
+version: '3'
+services:
+  zeemsv-web-report:
+    container_name: zeemsv-web-report
+    image: devtrustccv/zeemsv-web-report-:0.0.1
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - 8000:8000
+    volumes:
+      - ./:/var/www/html
+      - ./properties/.env:/var/www/html/.env 
