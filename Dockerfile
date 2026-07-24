@@ -1,56 +1,37 @@
-FROM node:22-bookworm-slim AS frontend
-
-WORKDIR /app
-
-COPY package*.json vite.config.js ./
-COPY resources ./resources
-
-RUN npm ci && npm run build
-
-
-FROM composer:2 AS vendor
-
-WORKDIR /app
-
-COPY composer.json composer.lock ./
-RUN composer install \
-    --no-dev \
-    --no-interaction \
-    --prefer-dist \
-    --optimize-autoloader \
-    --no-scripts
-
-COPY . .
-RUN composer dump-autoload --optimize && php artisan package:discover --ansi
-
-
-FROM php:8.3-apache
-
+# Use the official PHP 8.2 FPM image as the base image
+FROM php:8.3-fpm
+# Set the working directory inside the container
 WORKDIR /var/www/html
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libonig-dev \
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
     libpng-dev \
-    libpq-dev \
-    libzip-dev \
-    unzip \
-    && docker-php-ext-install bcmath exif gd mbstring pcntl pdo_mysql pdo_pgsql zip \
-    && a2enmod rewrite headers \
-    && sed -ri -e "s!/var/www/html!/var/www/html/public!g" /etc/apache2/sites-available/*.conf \
-    && sed -ri -e "s!/var/www/!/var/www/html/public!g" /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf \
-    && rm -rf /var/lib/apt/lists/*
+    libonig-dev \
+    libxml2-dev \
+    zip \
+    unzip
 
-COPY --from=vendor /app ./
-COPY --from=frontend /app/public/build ./public/build
+# Install PHP extensions
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
-RUN mkdir -p \
-    storage/app \
-    storage/framework/cache \
-    storage/framework/sessions \
-    storage/framework/views \
-    storage/logs \
-    bootstrap/cache \
-    && chown -R www-data:www-data storage bootstrap/cache \
-    && chmod -R ug+rwX storage bootstrap/cache
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-EXPOSE 80
+# Copy the application code to the container
+COPY . /var/www/html
+# Copiar o .env.example para .env
+RUN cp .env.example .env
+
+# Install dependencies using Composer
+RUN composer install --no-interaction --optimize-autoloader --no-dev
+
+# Generate the application key
+RUN php artisan key:generate
+
+# Expose the port that your Laravel application listens on
+EXPOSE 8000
+
+# Set the command to run your Laravel application
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
