@@ -1,43 +1,64 @@
-# Use the official PHP 8.2 FPM image as the base image
-FROM php:8.3-fpm
-# Set the working directory inside the container
+FROM node:22-bookworm-slim AS frontend
+
+WORKDIR /app
+
+COPY package*.json vite.config.js ./
+COPY resources ./resources
+
+RUN npm ci && npm run build
+
+
+FROM composer:2 AS vendor
+
+WORKDIR /app
+
+COPY composer.json composer.lock ./
+RUN composer install \
+    --no-dev \
+    --no-interaction \
+    --prefer-dist \
+    --optimize-autoloader \
+    --no-scripts
+
+COPY . .
+RUN composer dump-autoload --optimize && php artisan package:discover --ansi
+
+
+FROM php:8.3-apache
+
 WORKDIR /var/www/html
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    libpng-dev \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     libonig-dev \
-    libxml2-dev \
-    zip \
-    unzip
+    libpng-dev \
+    libpq-dev \
+    libzip-dev \
+    unzip \
+    && docker-php-ext-install bcmath exif gd mbstring pcntl pdo_mysql pdo_pgsql zip \
+    && a2enmod rewrite headers \
+    && echo "ServerName localhost" > /etc/apache2/conf-available/servername.conf \
+    && a2enconf servername \
+    && sed -ri -e "s!/var/www/html!/var/www/html/public!g" /etc/apache2/sites-available/*.conf \
+    && sed -ri -e "s!/var/www/!/var/www/html/public!g" /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
-
-# Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-## AUMENTAR TAMNAHO DE FICHEIRO ACEITE EM LARAVEL
 RUN echo "upload_max_filesize=500M" > /usr/local/etc/php/conf.d/uploads.ini \
     && echo "post_max_size=500M" >> /usr/local/etc/php/conf.d/uploads.ini \
     && echo "memory_limit=512M" >> /usr/local/etc/php/conf.d/uploads.ini \
     && echo "max_execution_time=300" >> /usr/local/etc/php/conf.d/uploads.ini
 
-# Copy the application code to the container
-COPY . /var/www/html
-# Copiar o .env.example para .env
-RUN cp .env.example .env
+COPY --from=vendor /app ./
+COPY --from=frontend /app/public/build ./public/build
 
-# Install dependencies using Composer
-RUN composer install --no-interaction --optimize-autoloader --no-dev
+RUN rm -f public/hot \
+    && mkdir -p \
+        storage/app \
+        storage/framework/cache \
+        storage/framework/sessions \
+        storage/framework/views \
+        storage/logs \
+        bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache \
+    && chmod -R ug+rwX storage bootstrap/cache
 
-# Generate the application key
-RUN php artisan key:generate
-
-# Expose the port that your Laravel application listens on
-EXPOSE 8000
-
-# Set the command to run your Laravel application
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+EXPOSE 80
