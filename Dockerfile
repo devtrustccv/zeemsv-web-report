@@ -61,4 +61,4 @@ RUN rm -f public/hot \
     && chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R ug+rwX storage bootstrap/cache
 
-EXPOSE 80
+EXPOSE 8000

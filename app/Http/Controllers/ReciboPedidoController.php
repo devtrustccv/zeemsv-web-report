@@ -9,9 +9,7 @@ use Throwable;
 
 class ReciboPedidoController extends Controller
 {
-    public function __construct(private readonly ApiService $apiService)
-    {
-    }
+    public function __construct(private readonly ApiService $apiService) {}
 
     public function show(int $idSolicitacao)
     {
@@ -47,6 +45,12 @@ class ReciboPedidoController extends Controller
             'entry_date' => $this->formatDate($data['data_entrada'] ?? null),
             'applicant' => $data['requerente'] ?? '---',
             'nif' => $data['nif'] ?? '---',
+            'validation_code' => $data['contra_prova']
+                ?? $data['validation_code']
+                ?? $data['codigo_validacao']
+                ?? $data['codigo_contra_prova']
+                ?? $data['codigo']
+                ?? null,
             'institution' => [
                 'name' => $institution['nome'] ?? 'ZEEMSV - ZONA ECONOMICA ESPECIAL MARITIMA EM SAO VICENTE',
                 'nif' => $institution['nif'] ?? '---',
@@ -57,13 +61,13 @@ class ReciboPedidoController extends Controller
             ],
             'documents' => array_map(fn (array $document) => [
                 'name' => $document['documento'] ?? $document['codigo'] ?? '---',
-                'required' => ($document['obrigatorio'] ?? 'Nao') === 'Sim',
-                'delivered' => (bool) ($document['entregue'] ?? $document['sim'] ?? false),
+                'required' => $this->isAffirmative($document['obrigatorio'] ?? false),
+                'delivered' => $this->isAffirmative($document['entregue'] ?? $document['sim'] ?? false),
             ], $data['documentos'] ?? []),
             'requirements' => array_map(fn (array $requirement) => [
                 'name' => $requirement['requisito'] ?? '---',
-                'required' => ($requirement['obrigatorio'] ?? 'Nao') === 'Sim',
-                'fulfilled' => (bool) ($requirement['cumprido'] ?? $requirement['sim'] ?? false),
+                'required' => $this->isAffirmative($requirement['obrigatorio'] ?? false),
+                'fulfilled' => $this->isAffirmative($requirement['cumprido'] ?? $requirement['sim'] ?? false),
             ], $data['requisitos'] ?? []),
         ];
     }
@@ -79,5 +83,18 @@ class ReciboPedidoController extends Controller
         } catch (\Throwable) {
             return $date;
         }
+    }
+
+    private function isAffirmative(mixed $value): bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        if (is_numeric($value)) {
+            return (int) $value === 1;
+        }
+
+        return in_array(strtolower(trim((string) $value)), ['sim', 's', 'yes', 'true', '1'], true);
     }
 }

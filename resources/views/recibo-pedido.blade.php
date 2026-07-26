@@ -6,50 +6,77 @@
     <title>Recibo de Submiss&atilde;o de Pedido</title>
     <style>
         :root {
-            --blue: #006aa6;
-            --dark-blue: #004d77;
-            --muted: #6f7f89;
-            --soft: #f1f3f4;
-            --table-head: #e5e7e8;
+            --blue: #005d91;
+            --blue-strong: #004b78;
+            --cyan: #17b7df;
+            --ink: #163344;
+            --muted: #496574;
+            --soft: #f6f6f6;
+            --soft-head: #f1f1f1;
+            --footer: #e6f5fb;
         }
 
         * {
             box-sizing: border-box;
         }
 
+        html,
         body {
             margin: 0;
-            background: #4a4a4a;
-            color: #18313f;
+            min-height: 100%;
+            background: #4b4b4b;
+            color: var(--ink);
             font-family: Arial, Helvetica, sans-serif;
-            font-size: 13px;
+            font-size: 10px;
         }
 
         .page {
-            width: 1120px;
-            min-height: 790px;
+            position: relative;
+            width: 210mm;
+            min-height: 297mm;
             margin: 16px auto;
+            overflow: hidden;
             background: #fff;
-            border: 4px solid var(--blue);
-            padding: 44px 28px 42px;
         }
 
-        .topbar {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 40px;
+        .hero {
+            position: relative;
+            height: 156px;
+            padding: 38px 40px 0;
+            color: #fff;
+            background:
+                radial-gradient(circle at 14% 82%, rgba(62, 191, 222, 0.55) 0 2px, transparent 3px),
+                radial-gradient(circle at 36% 56%, rgba(255, 255, 255, 0.18) 0 2px, transparent 3px),
+                linear-gradient(160deg, rgba(28, 185, 221, 0.68), rgba(0, 64, 113, 0.12) 38%, rgba(0, 36, 82, 0.6)),
+                repeating-linear-gradient(170deg, rgba(255, 255, 255, 0.12) 0 1px, transparent 2px 15px),
+                linear-gradient(180deg, #118fbd 0%, #063b70 58%, #041c43 100%);
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            right: -45px;
+            bottom: -1px;
+            left: -50px;
+            height: 88px;
+            background: #fff;
+            border-radius: 50% 50% 0 0 / 65% 70% 0 0;
+            transform: rotate(-4deg);
+            transform-origin: 58% 100%;
         }
 
         .brand {
+            position: relative;
+            z-index: 1;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            width: max-content;
         }
 
         .brand-logo {
-            width: 172px;
-            max-height: 58px;
+            width: 126px;
+            max-height: 44px;
             object-fit: contain;
             object-position: left center;
         }
@@ -57,166 +84,198 @@
         .brand-fallback {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .brand-mark {
-            width: 46px;
-            height: 46px;
+            position: relative;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             background:
-                radial-gradient(circle at 64% 28%, #36c7e6 0 16%, transparent 17%),
-                conic-gradient(from 205deg, #0074ad, #1fb3d2, #50bdd4, #00598a, #0074ad);
-            position: relative;
+                radial-gradient(circle at 64% 28%, #7bdff0 0 17%, transparent 18%),
+                conic-gradient(from 210deg, #0077ad, #32c3df, #64d1e2, #006b9f, #0077ad);
         }
 
         .brand-mark::after {
             content: "";
             position: absolute;
-            inset: 10px 15px 12px 7px;
+            inset: 7px 10px 8px 5px;
             background: #fff;
             border-radius: 60% 38% 55% 45%;
             transform: rotate(-32deg);
         }
 
         .brand-name {
-            color: #23739c;
-            font-size: 32px;
+            color: #fff;
+            font-size: 21px;
             font-weight: 800;
             letter-spacing: 0;
         }
 
-        .entity-info {
-            max-width: 560px;
-            text-align: right;
-            color: #1d4356;
-            line-height: 1.8;
-            font-size: 13px;
+        .content {
+            padding: 0 28px 96px;
         }
 
-        .entity-info strong {
-            color: var(--dark-blue);
+        .institution {
+            margin: 14px 10px 0 auto;
+            width: 356px;
+            text-align: right;
+            color: var(--ink);
+            line-height: 1.65;
+            font-size: 10px;
+        }
+
+        .institution strong {
+            display: inline-block;
+            margin-bottom: 4px;
+            color: var(--blue);
             font-weight: 800;
         }
 
-        .receipt-grid {
+        .receipt-main {
             display: grid;
-            grid-template-columns: 1fr 180px;
-            gap: 46px;
-            margin-top: 86px;
+            grid-template-columns: 1fr 137px;
+            gap: 38px;
             align-items: start;
+            margin-top: 108px;
         }
 
         h1 {
-            margin: 0 0 34px;
-            color: var(--dark-blue);
-            font-size: 15px;
+            margin: 0 0 23px;
+            color: var(--blue);
+            font-size: 11px;
             font-weight: 800;
         }
 
         .meta {
-            line-height: 1.7;
-            color: var(--muted);
+            color: var(--ink);
+            line-height: 1.58;
+            font-size: 10px;
         }
 
         .meta strong {
-            color: #24465a;
+            color: var(--blue-strong);
             font-weight: 700;
         }
 
         .doc-box {
-            width: 180px;
-            min-height: 170px;
-            border: 1.5px solid #50a3cf;
-            border-radius: 28px;
+            width: 126px;
+            min-height: 132px;
+            margin: 24px 0 0 auto;
+            border: 3px solid var(--cyan);
+            border-radius: 18px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            color: #0d3144;
-            margin-top: 42px;
+            justify-content: center;
+            color: var(--ink);
         }
 
         .doc-label {
-            font-size: 29px;
-            font-weight: 800;
-            letter-spacing: 0;
+            font-size: 25px;
+            font-weight: 500;
             line-height: 1;
         }
 
         .doc-count {
-            font-size: 58px;
-            font-weight: 400;
+            margin-top: 5px;
+            font-size: 43px;
             line-height: 1;
-            margin-top: 6px;
         }
 
         .table-section {
-            margin-top: 48px;
+            margin-top: 98px;
         }
 
         .table-section + .table-section {
-            margin-top: 30px;
+            margin-top: 24px;
         }
 
         .section-title {
-            margin: 0 0 18px;
-            color: #18313f;
-            font-size: 13px;
+            margin: 0 0 10px;
+            color: var(--ink);
+            font-size: 10px;
         }
 
         table {
             width: 100%;
             border-collapse: separate;
-            border-spacing: 0 8px;
+            border-spacing: 0 6px;
+            table-layout: fixed;
         }
 
         th,
         td {
-            height: 48px;
-            padding: 0 24px;
+            height: 34px;
+            padding: 0 12px;
             text-align: center;
-            font-size: 12px;
+            vertical-align: middle;
+            font-size: 9px;
         }
 
         th {
-            background: var(--table-head);
-            color: #19394d;
-            font-weight: 500;
+            background: var(--soft-head);
+            color: var(--ink);
+            font-weight: 700;
         }
 
         td {
             background: var(--soft);
-            color: #7a8a93;
+            color: var(--ink);
         }
 
         th:first-child,
         td:first-child {
-            border-radius: 14px 0 0 14px;
+            border-radius: 10px 0 0 10px;
         }
 
         th:last-child,
         td:last-child {
-            border-radius: 0 14px 14px 0;
+            border-radius: 0 10px 10px 0;
         }
 
         .check {
             display: inline-grid;
             place-items: center;
-            width: 18px;
-            height: 18px;
-            border: 1.4px solid #6f8793;
+            width: 15px;
+            height: 15px;
+            border: 1.2px solid #607783;
             border-radius: 5px;
-            color: #1a526c;
-            font-size: 13px;
+            color: var(--blue-strong);
+            font-size: 11px;
             line-height: 1;
+        }
+
+        .validation {
+            position: absolute;
+            right: 22px;
+            bottom: 0;
+            left: 22px;
+            text-align: center;
+            color: var(--ink);
+            font-size: 9px;
+        }
+
+        .validation-label {
+            margin-bottom: 11px;
+            font-weight: 700;
+        }
+
+        .validation-code {
+            min-height: 39px;
+            padding: 8px 20px;
+            background: var(--footer);
+            line-height: 1.5;
+            word-break: break-word;
         }
 
         .error-state {
             width: min(680px, 100%);
-            margin: 150px auto 0;
+            margin: 210px auto 0;
+            padding: 0 30px;
             text-align: center;
-            color: #24465a;
+            color: var(--ink);
         }
 
         .error-state h1 {
@@ -231,16 +290,23 @@
             line-height: 1.6;
         }
 
+        @page {
+            size: A4 portrait;
+            margin: 0;
+        }
+
         @media print {
+            html,
             body {
+                width: 210mm;
+                min-height: 297mm;
                 background: #fff;
             }
 
             .page {
-                width: 297mm;
-                min-height: 210mm;
+                width: 210mm;
+                min-height: 297mm;
                 margin: 0;
-                border-width: 3px;
             }
         }
     </style>
@@ -253,105 +319,110 @@
             <p>{{ $error }}</p>
         </section>
     @else
-    <header class="topbar">
-        <div class="brand" aria-label="ZEEMSV">
-            @if (! empty($receipt['institution']['logo']))
-                <img class="brand-logo" src="{{ $receipt['institution']['logo'] }}" alt="ZEEMSV">
-            @else
-                <div class="brand-fallback">
-                    <div class="brand-mark"></div>
-                    <div class="brand-name">ZEEMSV</div>
-                </div>
-            @endif
-        </div>
-
-        <div class="entity-info">
-            <strong>{{ $receipt['institution']['name'] }}</strong><br>
-            Contribuinte N.&ordm;: {{ $receipt['institution']['nif'] }}<br>
-            {{ $receipt['institution']['address'] }}<br>
-            Email: {{ $receipt['institution']['email'] }}<br>
-            Telef. {{ $receipt['institution']['phone'] }}
-        </div>
-    </header>
-
-    <section class="receipt-grid">
-        <div>
-            <h1>Recibo de Submiss&atilde;o de Pedido</h1>
-
-            <div class="meta">
-                <strong>Tipo de Processo :</strong> {{ $receipt['process_type'] }}<br>
-                <strong>Processo N&ordm; :</strong> {{ $receipt['process_number'] }}<br>
-                <strong>Tipo de Solicita&ccedil;&atilde;o :</strong> {{ $receipt['request_type'] }}<br>
-                <strong>Entidade :</strong> {{ $receipt['entity'] }}<br>
-                <strong>Data de Entrada :</strong> {{ $receipt['entry_date'] }}<br>
-                <strong>Requerente :</strong> {{ $receipt['applicant'] }}<br>
-                <strong>NIF :</strong> {{ $receipt['nif'] }}
+        <header class="hero">
+            <div class="brand" aria-label="ZEEMSV">
+                @if (! empty($receipt['institution']['logo']))
+                    <img class="brand-logo" src="{{ $receipt['institution']['logo'] }}" alt="ZEEMSV">
+                @else
+                    <div class="brand-fallback">
+                        <div class="brand-mark"></div>
+                        <div class="brand-name">ZEEMSV</div>
+                    </div>
+                @endif
             </div>
-        </div>
+        </header>
 
-        <aside class="doc-box">
-            <div class="doc-label">N&ordm; DOC</div>
-            <div class="doc-count">{{ $receipt['document_count'] }}</div>
-        </aside>
-    </section>
+        <section class="content">
+            <div class="institution">
+                <strong>{{ $receipt['institution']['name'] }}</strong><br>
+                Contribuinte N.&ordm;: {{ $receipt['institution']['nif'] }}<br>
+                {{ $receipt['institution']['address'] }}<br>
+                Email: {{ $receipt['institution']['email'] }}<br>
+                Telef. {{ $receipt['institution']['phone'] }}
+            </div>
 
-    <section class="table-section">
-        <p class="section-title">Foram entregues os seguintes documentos :</p>
+            <section class="receipt-main">
+                <div>
+                    <h1>Recibo de Submiss&atilde;o de Pedido</h1>
 
-        <table>
-            <thead>
-            <tr>
-                <th>Documentos</th>
-                <th>Obrigat&oacute;rios</th>
-                <th>Sim</th>
-                <th>N&atilde;o</th>
-            </tr>
-            </thead>
-            <tbody>
-            @forelse ($receipt['documents'] as $document)
-                <tr>
-                    <td>{{ $document['name'] }}</td>
-                    <td>{!! $document['required'] ? 'Sim' : 'N&atilde;o' !!}</td>
-                    <td><span class="check">{!! $document['delivered'] ? '&#10003;' : '' !!}</span></td>
-                    <td><span class="check">{!! ! $document['delivered'] ? '&#10003;' : '' !!}</span></td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="4">Sem documentos associados.</td>
-                </tr>
-            @endforelse
-            </tbody>
-        </table>
-    </section>
+                    <div class="meta">
+                        <strong>Tipo de Processo :</strong> {{ $receipt['process_type'] }}<br>
+                        <strong>Processo n&ordm; :</strong> {{ $receipt['process_number'] }}<br>
+                        <strong>Tipo de Solicita&ccedil;&atilde;o :</strong> {{ $receipt['request_type'] }}<br>
+                        <strong>Entidade :</strong> {{ $receipt['entity'] }}<br>
+                        <strong>Data de Entrada :</strong> {{ $receipt['entry_date'] }}<br>
+                        <strong>Requerente :</strong> {{ $receipt['applicant'] }}<br>
+                        <strong>NIF :</strong> {{ $receipt['nif'] }}
+                    </div>
+                </div>
 
-    <section class="table-section">
-        <p class="section-title">Foram validados os seguintes requisitos :</p>
+                <aside class="doc-box">
+                    <div class="doc-label">N&ordm; DOC</div>
+                    <div class="doc-count">{{ $receipt['document_count'] }}</div>
+                </aside>
+            </section>
 
-        <table>
-            <thead>
-            <tr>
-                <th>Requisitos</th>
-                <th>Obrigat&oacute;rios</th>
-                <th>Sim</th>
-                <th>N&atilde;o</th>
-            </tr>
-            </thead>
-            <tbody>
-            @forelse ($receipt['requirements'] as $requirement)
-                <tr>
-                    <td>{{ $requirement['name'] }}</td>
-                    <td>{!! $requirement['required'] ? 'Sim' : 'N&atilde;o' !!}</td>
-                    <td><span class="check">{!! $requirement['fulfilled'] ? '&#10003;' : '' !!}</span></td>
-                    <td><span class="check">{!! ! $requirement['fulfilled'] ? '&#10003;' : '' !!}</span></td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="4">Sem requisitos associados.</td>
-                </tr>
-            @endforelse
-            </tbody>
-        </table>
-    </section>
+            <section class="table-section">
+                <p class="section-title">Foram entregues os seguintes documentos :</p>
+
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Documentos</th>
+                        <th>Obrigat&oacute;rios</th>
+                        <th>Sim</th>
+                        <th>N&atilde;o</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @forelse ($receipt['documents'] as $document)
+                        <tr>
+                            <td>{{ $document['name'] }}</td>
+                            <td>{{ $document['required'] ? 'Sim' : 'N&atilde;o' }}</td>
+                            <td><span class="check">{!! $document['delivered'] ? '&#10003;' : '' !!}</span></td>
+                            <td><span class="check">{!! ! $document['delivered'] ? '&#10003;' : '' !!}</span></td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4">Sem documentos associados.</td>
+                        </tr>
+                    @endforelse
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="table-section">
+                <p class="section-title">Foram solicitados os seguintes requisitos :</p>
+
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Requisito</th>
+                        <th>Deve Cumprir?</th>
+                        <th>Cumpre?</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @forelse ($receipt['requirements'] as $requirement)
+                        <tr>
+                            <td>{{ $requirement['name'] }}</td>
+                            <td>{{ $requirement['required'] ? 'Sim' : 'N&atilde;o' }}</td>
+                            <td>{{ $requirement['fulfilled'] ? 'Sim' : 'N&atilde;o' }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="3">Sem requisitos associados.</td>
+                        </tr>
+                    @endforelse
+                    </tbody>
+                </table>
+            </section>
+        </section>
+
+        <footer class="validation">
+            <div class="validation-label">Contra Prova/Validation Code:</div>
+            <div class="validation-code">{{ $receipt['validation_code'] ?? '---' }}</div>
+        </footer>
     @endif
 </main>
 </body>
