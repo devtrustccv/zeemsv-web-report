@@ -36,6 +36,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     unzip \
     && docker-php-ext-install bcmath exif gd mbstring pcntl pdo_mysql pdo_pgsql zip \
     && a2enmod rewrite headers \
+    && sed -i 's/Listen 80/Listen 8000/' /etc/apache2/ports.conf \
+    && sed -i 's/:80/:8000/' /etc/apache2/sites-available/000-default.conf \
     && echo "ServerName localhost" > /etc/apache2/conf-available/servername.conf \
     && a2enconf servername \
     && sed -ri -e "s!/var/www/html!/var/www/html/public!g" /etc/apache2/sites-available/*.conf \
