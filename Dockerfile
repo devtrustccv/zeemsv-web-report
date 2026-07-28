@@ -24,7 +24,7 @@ COPY . .
 RUN composer dump-autoload --optimize && php artisan package:discover --ansi
 
 
-FROM php:8.3-apache
+FROM php:8.4-apache
 
 WORKDIR /var/www/html
 
