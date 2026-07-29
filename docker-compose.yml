@@ -1,16 +1,17 @@
 services:
   zeemsv-web-report:
     container_name: zeemsv-web-report
-    image: devtrustccv/zeemsv-web-report:0.0.1
-    restart: unless-stopped
+    image: devtrustcv/zeem-report-web:0.0.7
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - "8000:80"
-    env_file:
-      - ./properties/.env
-    environment:
-      APP_ENV: production
-      APP_DEBUG: "false"
-      LOG_CHANNEL: stderr
-      SESSION_DRIVER: file
-      CACHE_STORE: file
-      QUEUE_CONNECTION: sync
+      - 8000:8000
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: ./.env
+        target: /var/www/html/.env
+        read_only: true
+        bind:
+          create_host_path: false

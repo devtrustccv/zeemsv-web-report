@@ -2,6 +2,8 @@ FROM node:22-bookworm-slim AS frontend
 
 WORKDIR /app
 
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+
 COPY package*.json vite.config.js ./
 COPY resources ./resources
 
@@ -28,12 +30,22 @@ FROM php:8.4-apache
 
 WORKDIR /var/www/html
 
+ENV BROWSERSHOT_CHROME_PATH=/usr/bin/chromium
+ENV BROWSERSHOT_NO_SANDBOX=true
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    chromium \
+    fonts-dejavu \
     libonig-dev \
     libpng-dev \
     libpq-dev \
+    libwebp-dev \
     libzip-dev \
+    nodejs \
+    npm \
     unzip \
+    && docker-php-ext-configure gd --with-webp \
     && docker-php-ext-install bcmath exif gd mbstring pcntl pdo_mysql pdo_pgsql zip \
     && a2enmod rewrite headers \
     && sed -i 's/Listen 80/Listen 8000/' /etc/apache2/ports.conf \
@@ -51,6 +63,8 @@ RUN echo "upload_max_filesize=500M" > /usr/local/etc/php/conf.d/uploads.ini \
 
 COPY --from=vendor /app ./
 COPY --from=frontend /app/public/build ./public/build
+
+RUN npm ci --omit=dev
 
 RUN rm -f public/hot \
     && mkdir -p \

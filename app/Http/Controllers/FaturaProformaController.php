@@ -2,13 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\PdfReportService;
+
 class FaturaProformaController extends Controller
 {
+    public function __construct(private readonly PdfReportService $pdfReportService) {}
+
     public function show()
     {
-        return view('fatura-proforma', [
-            'invoice' => $this->mockInvoice(),
-        ]);
+        $invoice = $this->mockInvoice();
+
+        return $this->pdfReportService->render('fatura-proforma', [
+            'invoice' => $invoice,
+        ], str_replace('/', '-', strtolower($invoice['title'])).'.pdf');
     }
 
     private function mockInvoice(): array

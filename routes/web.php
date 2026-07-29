@@ -11,5 +11,8 @@ Route::get('/', function () {
 Route::get('/recibo-pedido/{idSolicitacao}', [ReciboPedidoController::class, 'show'])
     ->name('recibo-pedido.show');
 
+Route::get('/recibo-pedido/{idSolicitacao}/html', [ReciboPedidoController::class, 'showHtml'])
+    ->name('recibo-pedido.html');
+
 Route::get('/fatura-proforma', [FaturaProformaController::class, 'show'])
     ->name('fatura-proforma.show');
