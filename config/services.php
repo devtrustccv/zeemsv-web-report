@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'report' => [
+        'internal_url' => env(
+            'REPORT_INTERNAL_URL',
+            'http://127.0.0.1:8000'
+        ),
+    ],
+
 ];

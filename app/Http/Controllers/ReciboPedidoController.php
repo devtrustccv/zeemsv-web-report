@@ -42,11 +42,13 @@ class ReciboPedidoController extends Controller
             'receipt' => $receipt,
             'headerImage' => $this->headerImageDataUri(),
         ])->render();
+        $htmlUrl = rtrim(config('services.report.internal_url'), '/')
+            . "/recibo-pedido/{$idSolicitacao}/html";
 
         try {
             return $this->browserPdfReportService->renderHtml(
                 $html,
-                route('recibo-pedido.html', ['idSolicitacao' => $idSolicitacao]),
+                $htmlUrl,
                 $filename,
             );
         } catch (Throwable $browserException) {
