@@ -95,6 +95,7 @@ class ReciboPedidoController extends Controller
         $qrCodeContent = $data['qr_code_link']
             ?? $data['qrCodeLink']
             ?? $data['qrcode_link']
+            ?? $data['link_recibo']
             ?? $data['link_qr']
             ?? $data['qr_link']
             ?? $data['url_validacao']
@@ -102,12 +103,16 @@ class ReciboPedidoController extends Controller
             ?? ($this->looksLikeImageSource($rawQrCode) ? null : $rawQrCode)
             ?? null;
         $qrCodeImage = $this->looksLikeImageSource($rawQrCode) ? $rawQrCode : null;
-        $logo = $institution['logo']
-            ?? $institution['logotipo']
-            ?? $institution['logo_url']
-            ?? $institution['url_logo']
-            ?? $institution['id_logo']
-            ?? null;
+        $logo = $this->firstImageReference([
+            $institution['logo'] ?? null,
+            $institution['logotipo'] ?? null,
+            $institution['logo_url'] ?? null,
+            $institution['url_logo'] ?? null,
+            $institution['link_logo'] ?? null,
+            $institution['logo_path'] ?? null,
+            $institution['caminho_logo'] ?? null,
+            $institution['id_logo'] ?? null,
+        ]);
 
         return [
             'document_count' => $data['nr_doc'] ?? count($data['documentos'] ?? []),
@@ -192,6 +197,40 @@ class ReciboPedidoController extends Controller
         }
 
         return (bool) preg_match('/\.(svg|png|jpe?g|gif|webp)(\?.*)?$/i', $value);
+    }
+
+    private function firstImageReference(array $candidates): ?string
+    {
+        foreach ($candidates as $candidate) {
+            $candidate = trim((string) $candidate);
+
+            if ($candidate === '') {
+                continue;
+            }
+
+            if ($this->isUsableImageReference($candidate)) {
+                return $candidate;
+            }
+        }
+
+        return null;
+    }
+
+    private function isUsableImageReference(string $value): bool
+    {
+        if (str_starts_with($value, 'data:image/')) {
+            return true;
+        }
+
+        if (filter_var($value, FILTER_VALIDATE_URL)) {
+            return true;
+        }
+
+        if ($this->looksLikeImageSource($value)) {
+            return true;
+        }
+
+        return str_contains($value, '/') || str_contains($value, '\\');
     }
 
     private function pdfSafeImageDataUri(mixed $source): ?string

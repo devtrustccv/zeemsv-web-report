@@ -14,5 +14,13 @@ Route::get('/recibo-pedido/{idSolicitacao}', [ReciboPedidoController::class, 'sh
 Route::get('/recibo-pedido/{idSolicitacao}/html', [ReciboPedidoController::class, 'showHtml'])
     ->name('recibo-pedido.html');
 
-Route::get('/fatura-proforma', [FaturaProformaController::class, 'show'])
+Route::get('/fatura-proforma/{idSolicitacao}', [FaturaProformaController::class, 'show'])
+    ->whereNumber('idSolicitacao')
     ->name('fatura-proforma.show');
+
+Route::get('/fatura-proforma/{idSolicitacao}/html', [FaturaProformaController::class, 'showHtml'])
+    ->whereNumber('idSolicitacao')
+    ->name('fatura-proforma.html');
+
+Route::get('/fatura-proforma', [FaturaProformaController::class, 'show'])
+    ->name('fatura-proforma.preview');

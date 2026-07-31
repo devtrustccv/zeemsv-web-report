@@ -120,6 +120,37 @@ class ApiService
         $this->handleErrorResponse($response);
     }
 
+    public function fetchFaturaProformaDados($idSolicitacao)
+    {
+        $baseUrl = rtrim(env('LINK_API_ZEEMSV'), '/');
+        if (! $baseUrl) {
+            abort(500, 'Servico de fatura proforma nao configurado.');
+        }
+
+        $url = "{$baseUrl}/solicitacaos/{$idSolicitacao}/fatura-proforma-dados";
+
+        try {
+            $response = Http::withOptions(['verify' => false])
+                ->timeout(15)
+                ->accept('*/*')
+                ->get($url);
+        } catch (ConnectionException) {
+            abort(503, 'Nao foi possivel comunicar com o servico de fatura proforma. Tente novamente mais tarde.');
+        }
+
+        if ($response->successful()) {
+            $responseData = $response->json();
+
+            if (($responseData['success'] ?? false) !== true || ! isset($responseData['data'])) {
+                abort(404, $responseData['message'] ?? 'Dados da fatura proforma nao encontrados.');
+            }
+
+            return $responseData['data'];
+        }
+
+        $this->handleErrorResponse($response);
+    }
+
     public function fetchRvcc($id)
     {
 

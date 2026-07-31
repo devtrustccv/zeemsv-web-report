@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $invoice['title'] }}</title>
+    <title>{{ $invoice['title'] ?? 'Fatura Pro Forma' }}</title>
     <style>
         :root {
             --blue: #005d91;
@@ -43,25 +43,16 @@
             height: 148px;
             padding: 38px 40px 0;
             color: #fff;
-            background:
-                radial-gradient(circle at 16% 80%, rgba(62, 191, 222, 0.55) 0 2px, transparent 3px),
-                radial-gradient(circle at 36% 52%, rgba(255, 255, 255, 0.18) 0 2px, transparent 3px),
-                linear-gradient(160deg, rgba(28, 185, 221, 0.68), rgba(0, 64, 113, 0.12) 38%, rgba(0, 36, 82, 0.6)),
-                repeating-linear-gradient(170deg, rgba(255, 255, 255, 0.12) 0 1px, transparent 2px 15px),
-                linear-gradient(180deg, #118fbd 0%, #063b70 58%, #041c43 100%);
+            background: #063b70;
         }
 
-        .hero::after {
-            content: "";
+        .hero-image {
             position: absolute;
-            right: -45px;
-            bottom: -1px;
-            left: -50px;
-            height: 86px;
-            background: #fff;
-            border-radius: 50% 50% 0 0 / 65% 70% 0 0;
-            transform: rotate(-4deg);
-            transform-origin: 58% 100%;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center top;
         }
 
         .brand {
@@ -219,6 +210,7 @@
             line-height: 1.4;
         }
 
+        .qr-code,
         .qr {
             display: grid;
             grid-template-columns: repeat(9, 1fr);
@@ -229,6 +221,11 @@
             gap: 2px;
             border: 1px solid #cad9df;
             background: #fff;
+        }
+
+        .qr-code {
+            display: block;
+            padding: 0;
         }
 
         .qr span {
@@ -350,6 +347,27 @@
             font-weight: 700;
         }
 
+        .error-state {
+            width: min(680px, 100%);
+            margin: 210px auto 0;
+            padding: 0 30px;
+            text-align: center;
+            color: var(--ink);
+        }
+
+        .error-state h1 {
+            margin-bottom: 16px;
+            color: var(--blue);
+            font-size: 22px;
+        }
+
+        .error-state p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
         @page {
             size: A4 portrait;
             margin: 0;
@@ -373,12 +391,30 @@
 </head>
 <body>
 <main class="page">
-    <header class="hero">
-        <div class="brand" aria-label="ZEEMSV">
-            <div class="brand-mark"></div>
-            <div class="brand-name">ZEEMSV</div>
-        </div>
-    </header>
+    @if ($error ?? false)
+        <section class="error-state">
+            <h1>N&atilde;o foi poss&iacute;vel carregar a fatura proforma</h1>
+            <p>{{ $error }}</p>
+        </section>
+    @else
+        @php
+            if (! isset($headerImage)) {
+                $headerImagePath = public_path('img/fatura-header.svg');
+                $headerImage = file_exists($headerImagePath)
+                    ? 'data:image/svg+xml;base64,'.base64_encode(file_get_contents($headerImagePath))
+                    : null;
+            }
+        @endphp
+
+        <header class="hero">
+            @if ($headerImage)
+                <img class="hero-image" src="{{ $headerImage }}" alt="">
+            @endif
+            <div class="brand" aria-label="ZEEMSV">
+                <div class="brand-mark"></div>
+                <div class="brand-name">ZEEMSV</div>
+            </div>
+        </header>
 
     <section class="content">
         <div class="institution">
@@ -496,11 +532,15 @@
 
             <div class="validation">
                 {{ $invoice['validation_code'] }}
-                <div class="qr" aria-label="QR Code">
-                    @for ($index = 0; $index < 81; $index++)
-                        <span></span>
-                    @endfor
-                </div>
+                @if (! empty($invoice['qr_code']))
+                    <img class="qr-code" src="{{ $invoice['qr_code'] }}" alt="QR Code">
+                @else
+                    <div class="qr" aria-label="QR Code">
+                        @for ($index = 0; $index < 81; $index++)
+                            <span></span>
+                        @endfor
+                    </div>
+                @endif
             </div>
 
             <div>
@@ -547,6 +587,7 @@
         <span class="info-icon">i</span>
         <span>Documento sem efeitos fiscais</span>
     </footer>
+    @endif
 </main>
 </body>
 </html>
